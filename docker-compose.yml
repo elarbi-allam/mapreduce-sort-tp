@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  # Conteneur Maître (Namenode, Resourcemanager)
+  namenode:
+    image: liliasfaxi/spark-hadoop:hv-2.7.2 # Utilisation du tag spécifique
+    hostname: namenode
+    container_name: namenode
+    environment:
+      HADOOP_MODE: master
+    ports:
+      - "50070:50070" # HDFS Web UI pour Hadoop 2.x
+      - "8088:8088" # YARN Web UI
+    volumes:
+      - ./app:/home/hadoop/app # Montez votre répertoire d'application
+    tty: true
+
+  # Conteneur Esclave 1
+  datanode1:
+    image: liliasfaxi/spark-hadoop:hv-2.7.2
+    hostname: datanode1
+    container_name: datanode1
+    environment:
+      HADOOP_MODE: slave
+    volumes:
+      - ./app:/home/hadoop/app
+    depends_on:
+      - namenode
+    tty: true
+
+  # Conteneur Esclave 2
+  datanode2:
+    image: liliasfaxi/spark-hadoop:hv-2.7.2
+    hostname: datanode2
+    container_name: datanode2
+    environment:
+      HADOOP_MODE: slave
+    volumes:
+      - ./app:/home/hadoop/app
+    depends_on:
+      - namenode
+    tty: true
